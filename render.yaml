@@ -1,0 +1,59 @@
+services:
+  - type: web
+    name: tv-alert-bot
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: TELEGRAM_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+      - key: WEBHOOK_SECRET
+        sync: false
+```
+
+---
+
+## Phase 2 — Create your Telegram Bot
+
+1. Open Telegram and search for **@BotFather**.
+2. Send `/newbot`, give it a name and username — you'll receive a **token** like `7123456789:AAF...`. Save it.
+3. Start a conversation with your new bot (send it any message).
+4. To get your **Chat ID**, visit this URL in your browser (replace `<TOKEN>` with yours):
+```
+   https://api.telegram.org/bot<TOKEN>/getUpdates
+```
+   Look for `"chat":{"id": 123456789}` in the response. That number is your Chat ID.
+
+---
+
+## Phase 3 — Deploy to Render (free tier)
+
+Render's free tier keeps your server running 24/7 — unlike alternatives that spin down after inactivity.
+
+1. Push your project to a **GitHub repo** (just those three files).
+2. Go to [render.com](https://render.com) → **New → Web Service**.
+3. Connect your GitHub account and select the repo.
+4. Render will auto-detect `render.yaml`. Confirm the settings.
+5. Under **Environment Variables**, add:
+   - `TELEGRAM_TOKEN` → your bot token
+   - `TELEGRAM_CHAT_ID` → your chat ID (as a string)
+   - `WEBHOOK_SECRET` → any random string you choose (e.g. `my-secret-42`)
+6. Click **Deploy**. In ~2 minutes you'll get a URL like:
+```
+   https://tv-alert-bot.onrender.com
+```
+7. Test it's live:
+```
+   curl https://tv-alert-bot.onrender.com/health
+   # → {"status": "running"}
+```
+
+---
+
+## Phase 4 — Wire up TradingView
+
+In any TradingView alert, set the **Webhook URL** to:
+```
+https://tv-alert-bot.onrender.com/alert
