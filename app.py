@@ -141,7 +141,7 @@ def monitor():
                     fired.discard(key)
             except Exception as e:
                 print(f"Error checking {key}: {e}")
-        time.sleep(60)
+        time.sleep(20)
 
 # ── telegram webhook ─────────────────────────────────────────────────────────
 
